@@ -10,6 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $message = "";
 $day = $_GET['day'] ?? 'Monday';
+$CurrentWeek = $_GET['week'] ?? 'A';
 
 // Load all classes for this user
 $stmt = $conn->prepare("SELECT id, subject_name FROM classes WHERE user_id = ?");
@@ -19,12 +20,25 @@ $result = $stmt->get_result();
 $classes = $result->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
+
+
 // For “Next Day” navigation
-$Weeks = ["A","B"];
-$CurrentWeek = $Weeks[0];
 $days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 $currentIndex = array_search($day, $days);
 $nextDay = $days[min($currentIndex + 1, count($days) - 1)];
+
+if ($day == "Friday") {
+    if ($CurrentWeek === "A") {
+        $nextWeek = "B";
+        $nextDay = "Monday";
+    } else {
+        $nextWeek = "B";
+    }
+} else { 
+    $nextWeek = $CurrentWeek;
+}
+
+
 
 
 
@@ -59,8 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Load current timetable for this day
-$stmt = $conn->prepare("SELECT period_number, subject_id FROM timetable_entries WHERE user_id = ? AND day = ?");
-$stmt->bind_param("is", $user_id, $day);
+$stmt = $conn->prepare("SELECT period_number, subject_id FROM timetable_entries WHERE user_id = ? AND day = ? AND Week = ?");
+$stmt->bind_param("iss", $user_id, $day,$CurrentWeek);
 $stmt->execute();
 $result = $stmt->get_result();
 $timetable = [];
@@ -168,14 +182,23 @@ $periods = [
 
     <br>
 
-    <?php if ($day !== "Friday" && $CurrentWeek !== "B"): ?>
+    <?php if ($CurrentWeek === "A" || ($CurrentWeek === "B" && $day !== "Friday")): ?>
         <form method="GET">
             <input type="hidden" name="day" value="<?= htmlspecialchars($nextDay) ?>">
+            <input type="hidden" name="week" value="<?= htmlspecialchars($nextWeek) ?>">
+            <input type="hidden" name="action" value="<?= htmlspecialchars("Next") ?>">
             <button type="submit">➡️ Next: <?= htmlspecialchars($nextDay) ?></button>
         </form>
     <?php else: ?>
         <p>🎉 All days completed!</p>
     <?php endif; ?>
+
+    <form method="GET">
+        <input type="hidden" name="day" value="<?= htmlspecialchars($nextDay) ?>">           
+        <input type="hidden" name="week" value="<?= htmlspecialchars($nextWeek) ?>">
+        <input type="hidden" name="action" value="<?= htmlspecialchars("Back") ?>">
+        <button type="submit">Back: <?= htmlspecialchars($nextDay) ?></button>
+    </form>
 
 </body>
 </html>
