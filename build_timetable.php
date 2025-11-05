@@ -11,8 +11,8 @@ $user_id = $_SESSION['user_id'];
 $message = "";
 $day = $_GET['day'] ?? 'Monday';
 $CurrentWeek = $_GET['week'] ?? 'A';
-$action = $_GET['action'];
-
+$action = $_GET['action'] ?? "Next";
+echo $action;
 $days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 $currentIndex = array_search($day, $days);
 
@@ -23,24 +23,22 @@ if ($action === "Next") {
         if ($CurrentWeek === "A") {
             $nextWeek = "B";
             $nextDay = "Monday";
-        } else {
-            $nextWeek = "B";
-        }
+        } 
     } else { 
         $nextWeek = $CurrentWeek;
     }
 
-} elseif ($action == "Back") {
-    $previousday = $days[min($currentIndex - 1, count($days)- 1)];
-
+} elseif ($action === "Back") {
+    $previousday = $days[max($currentIndex - 1,0)];
+    $previousweek = $CurrentWeek;
     if ($day == "Monday") {
         if ($CurrentWeek === "B") {
-            $previousweek = "A";
-            $previousday = "Friday";
-        } else {
-            $previousweek = "A";
+           $previousweek = "A";
+           $previousday = "Friday";
+        } elseif ($CurrentWeek === "A") {
+          // this is where youll go back to the class builder   
         }
-    }
+    } 
 }
 
 // Load all classes for this user
@@ -203,10 +201,10 @@ $periods = [
     <?php endif; ?>
 
     <form method="GET">
-        <input type="hidden" name="day" value="<?= htmlspecialchars($nextDay) ?>">           
-        <input type="hidden" name="week" value="<?= htmlspecialchars($nextWeek) ?>">
+        <input type="hidden" name="day" value="<?= htmlspecialchars($previousday) ?>">           
+        <input type="hidden" name="week" value="<?= htmlspecialchars($previousweek) ?>">
         <input type="hidden" name="action" value="<?= htmlspecialchars("Back") ?>">
-        <button type="submit">Back: <?= htmlspecialchars($nextDay) ?></button>
+        <button type="submit">Back: <?= htmlspecialchars($previousday) ?></button>
     </form>
 
 </body>
