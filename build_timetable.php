@@ -11,6 +11,28 @@ $user_id = $_SESSION['user_id'];
 $message = "";
 $day = $_GET['day'] ?? 'Monday';
 $CurrentWeek = $_GET['week'] ?? 'A';
+$action = $_GET['action'];
+
+$days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+$currentIndex = array_search($day, $days);
+
+if ($action == "Next") {
+    $nextDay = $days[min($currentIndex + 1, count($days) - 1)];
+
+    if ($day == "Friday") {
+        if ($CurrentWeek === "A") {
+            $nextWeek = "B";
+            $nextDay = "Monday";
+        } else {
+            $nextWeek = "B";
+        }
+    } else { 
+        $nextWeek = $CurrentWeek;
+    }
+
+} elseif ($action == "Back") {
+
+}
 
 // Load all classes for this user
 $stmt = $conn->prepare("SELECT id, subject_name FROM classes WHERE user_id = ?");
@@ -19,28 +41,6 @@ $stmt->execute();
 $result = $stmt->get_result();
 $classes = $result->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
-
-
-
-// For “Next Day” navigation
-$days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-$currentIndex = array_search($day, $days);
-$nextDay = $days[min($currentIndex + 1, count($days) - 1)];
-
-if ($day == "Friday") {
-    if ($CurrentWeek === "A") {
-        $nextWeek = "B";
-        $nextDay = "Monday";
-    } else {
-        $nextWeek = "B";
-    }
-} else { 
-    $nextWeek = $CurrentWeek;
-}
-
-
-
-
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
