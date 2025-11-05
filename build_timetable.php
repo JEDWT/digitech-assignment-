@@ -31,9 +31,11 @@ if ($action === "Next") {
 } elseif ($action === "Back") {
     $previousday = $days[max($currentIndex - 1,0)];
     $previousweek = $CurrentWeek;
+    echo $previousday;
     if ($day == "Monday") {
         if ($CurrentWeek === "B") {
            $previousweek = "A";
+
            $previousday = "Friday";
         } elseif ($CurrentWeek === "A") {
           // this is where youll go back to the class builder   
