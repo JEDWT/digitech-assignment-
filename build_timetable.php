@@ -16,7 +16,7 @@ $action = $_GET['action'];
 $days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 $currentIndex = array_search($day, $days);
 
-if ($action == "Next") {
+if ($action === "Next") {
     $nextDay = $days[min($currentIndex + 1, count($days) - 1)];
 
     if ($day == "Friday") {
@@ -31,7 +31,16 @@ if ($action == "Next") {
     }
 
 } elseif ($action == "Back") {
+    $previousday = $days[min($currentIndex - 1, count($days)- 1)];
 
+    if ($day == "Monday") {
+        if ($CurrentWeek === "B") {
+            $previousweek = "A";
+            $previousday = "Friday";
+        } else {
+            $previousweek = "A";
+        }
+    }
 }
 
 // Load all classes for this user
