@@ -24,5 +24,44 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+$userid = $_SESSION['user_id'];
+$timetable_created = 1;
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $confirm = $conn->prepare("UPDATE users SET timetable_created = ? WHERE id = ?");
+    $confirm->bind_param("ii",$timetable_created,$userid);
+    $confirm->execute();
+    $confirm->close();
+};
+
+$day_Names = ["Monday","Tuesday","Wednesday","Thursday","Friday"];
+$periods = 5;
+$days = 5;
+$weeks = 2;
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+    <title>Timetable - <?= htmlspecialchars($day) ?></title>
+</head>
+<body>
+    <table>
+    <?php foreach ($weeks as $Current_Week): 
+            foreach ($days as $Current_Day):
+                foreach ($periods as $current_Period): ?>
+
+
+                
+    <?php               endforeach;
+                    endforeach; 
+            endforeach; ?>
+        
+    
+    </table>
+</body>
+
+
+
+
+
