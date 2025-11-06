@@ -12,35 +12,40 @@ $message = "";
 $day = $_GET['day'] ?? 'Monday';
 $CurrentWeek = $_GET['week'] ?? 'A';
 $action = $_GET['action'] ?? "Next";
-echo $action;
+
 $days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 $currentIndex = array_search($day, $days);
 
-if ($action === "Next") {
-    $nextDay = $days[min($currentIndex + 1, count($days) - 1)];
+$nextDay = $day;
+$nextWeek = $CurrentWeek;
+$previousday = $day;
+$previousweek = $CurrentWeek;
 
+if ($action === "Next") {
+    
     if ($day == "Friday") {
         if ($CurrentWeek === "A") {
             $nextWeek = "B";
             $nextDay = "Monday";
-        } 
+        } else {
+            $nextWeek = "A";
+        }
+        $nextDay = "Monday";
     } else { 
-        $nextWeek = $CurrentWeek;
+       $nextDay = $days[min($currentIndex + 1, count($days) - 1)];
     }
-
-} elseif ($action === "Back") {
-    $previousday = $days[max($currentIndex - 1,0)];
-    $previousweek = $CurrentWeek;
-    echo $previousday;
+} 
+if ($action === "Back") {
     if ($day == "Monday") {
         if ($CurrentWeek === "B") {
            $previousweek = "A";
-
            $previousday = "Friday";
         } elseif ($CurrentWeek === "A") {
           // this is where youll go back to the class builder   
         }
-    } 
+    } else {
+        $previousday = $days[max($currentIndex - 1,0)];
+    }
 }
 
 // Load all classes for this user
