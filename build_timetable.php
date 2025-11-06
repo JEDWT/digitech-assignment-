@@ -11,40 +11,64 @@ $user_id = $_SESSION['user_id'];
 $message = "";
 $day = $_GET['day'] ?? 'Monday';
 $CurrentWeek = $_GET['week'] ?? 'A';
-$action = $_GET['action'] ?? "Next";
+$action = $_GET['action'] ?? null;
 
 $days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 $currentIndex = array_search($day, $days);
 
+if ($action === "Next") {
+    if ($day == "Friday") {
+        if ($CurrentWeek === "A") {
+            $CurrentWeek = "B";
+            $day = "Monday";
+        } else {
+            $CurrentWeek = "A";
+            $day = "Monday";
+        }
+    } else { 
+        $day = $days[min($currentIndex + 1, count($days) - 1)];
+    }
+} 
+
+if ($action === "Back") {
+    if ($day == "Monday") {
+        if ($CurrentWeek === "B") {
+            $CurrentWeek = "A";
+            $day = "Friday";
+        } elseif ($CurrentWeek === "A") {
+            // this is where you'll go back to the class builder   
+        }
+    } else {
+        $day = $days[max($currentIndex - 1, 0)];
+    }
+}
+
+// Now set the values for the next/previous buttons
+$currentIndex = array_search($day, $days); // Recalculate after updates
 $nextDay = $day;
 $nextWeek = $CurrentWeek;
 $previousday = $day;
 $previousweek = $CurrentWeek;
 
-if ($action === "Next") {
-    
+if ($day == "Friday" && $CurrentWeek === "B") {
+    // At the end, no next
+} else {
     if ($day == "Friday") {
-        if ($CurrentWeek === "A") {
-            $nextWeek = "B";
-            $nextDay = "Monday";
-        } else {
-            $nextWeek = "A";
-        }
+        $nextWeek = ($CurrentWeek === "A") ? "B" : "A";
         $nextDay = "Monday";
-    } else { 
-       $nextDay = $days[min($currentIndex + 1, count($days) - 1)];
-    }
-} 
-if ($action === "Back") {
-    if ($day == "Monday") {
-        if ($CurrentWeek === "B") {
-           $previousweek = "A";
-           $previousday = "Friday";
-        } elseif ($CurrentWeek === "A") {
-          // this is where youll go back to the class builder   
-        }
     } else {
-        $previousday = $days[max($currentIndex - 1,0)];
+        $nextDay = $days[$currentIndex + 1];
+    }
+}
+
+if ($day == "Monday" && $CurrentWeek === "A") {
+    // At the beginning, handle back to class builder
+} else {
+    if ($day == "Monday") {
+        $previousweek = "A";
+        $previousday = "Friday";
+    } else {
+        $previousday = $days[$currentIndex - 1];
     }
 }
 
@@ -197,7 +221,7 @@ $periods = [
     <br>
 
     <?php if ($CurrentWeek === "A" || ($CurrentWeek === "B" && $day !== "Friday")): ?>
-        <form method="GET">
+        <form method="Get">
             <input type="hidden" name="day" value="<?= htmlspecialchars($nextDay) ?>">
             <input type="hidden" name="week" value="<?= htmlspecialchars($nextWeek) ?>">
             <input type="hidden" name="action" value="<?= htmlspecialchars("Next") ?>">
@@ -207,11 +231,11 @@ $periods = [
         <p>🎉 All days completed!</p>
     <?php endif; ?>
 
-    <form method="GET">
+    <form method="Get">
         <input type="hidden" name="day" value="<?= htmlspecialchars($previousday) ?>">           
         <input type="hidden" name="week" value="<?= htmlspecialchars($previousweek) ?>">
         <input type="hidden" name="action" value="<?= htmlspecialchars("Back") ?>">
-        <button type="submit">Back: <?= htmlspecialchars($previousday) ?></button>
+        <button type="submit">⬅️ Back: <?= htmlspecialchars($previousday) ?></button>
     </form>
 
 </body>
