@@ -2,6 +2,23 @@
 session_start();
 require_once 'php/db_connect.php';
 
+if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
+    $token = $_COOKIE['remember_me'];
+
+    $stmt = $conn->prepare("SELECT id, first_name, last_name FROM users WHERE remember_token = ?");
+    $stmt->bind_param("s", $token);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+
+    if ($user) {
+        // Restore the session
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['first_name'] . ' ' . $user['last_name'];
+    }
+}
+
+// If still not logged in, redirect to login page
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit;
@@ -75,6 +92,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $message = "$day saved successfully!";
+    // Redirect if next/back button pressed
+    if (isset($_POST['action'])) {
+        if ($_POST['action'] === 'next') {
+            header("Location: build_timetable.php?day=" . urlencode($nextDay) . "&week=" . urlencode($nextWeek));
+            exit;
+        } elseif ($_POST['action'] === 'back') {
+            header("Location: build_timetable.php?day=" . urlencode($previousday) . "&week=" . urlencode($previousweek));
+            exit;
+        }
+    }
 }
 
 // Load current timetable for this day
@@ -112,15 +139,22 @@ $periods = [
             align-items: center;
             padding: 40px;
         }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* center children horizontally */
+            width: 60%;          /* optional max width */
+        }
         table {
             border-collapse: collapse;
             background: white;
-            width: 60%;
+            width: 100%; /* fill container width */
             box-shadow: 0 3px 10px rgba(0,0,0,0.1);
             border-radius: 8px;
+            margin-bottom: 20px; /* space between table and buttons */
         }
         th, td {
-            padding: 12px;
+            padding: 25px;
             border-bottom: 1px solid #ddd;
             text-align: center;
         }
@@ -129,20 +163,42 @@ $periods = [
             border-radius: 6px;
         }
         button {
-            margin-top: 20px;
+            margin-top: 5px;
             padding: 10px 20px;
             background: #0078ff;
             color: white;
             border: none;
             border-radius: 6px;
             cursor: pointer;
+            flex-direction: column; /* stack buttons vertically */
         }
-        button:hover {
-            background: #005fc7;
-        }
+     
         .message {
             margin: 10px;
             color: green;
+        }
+        
+       .button-group {
+            display: flex;
+            flex-direction: column; /* vertical stack */
+            align-items: center;
+            gap: 10px;              /* spacing between buttons */
+            width: 100%;            /* same as container width */
+        }
+
+        .button-group button {
+            width: 60%; /* slightly smaller than table */
+            padding: 10px 0;
+            background: #0078ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .button-group button:hover {
+            background: #005fc7;
         }
     </style>
 </head>
@@ -152,7 +208,7 @@ $periods = [
     <?php if ($message): ?>
         <div class="message"><?= htmlspecialchars($message) ?></div>
     <?php endif; ?>
-
+<div class="container">
     <form method="POST">
         <table>
             <tr>
@@ -180,32 +236,33 @@ $periods = [
             <?php endforeach; ?>
         </table>
 
-        <button type="submit">💾 Save <?= htmlspecialchars($day) ?></button>
-    </form>
+        <div class="button-group">
+            <button type="submit">💾 Save <?= htmlspecialchars($day) ?></button>
 
-    <br>
+
+            <!-- Next Button -->
+            <?php if (!($day == "Friday" && $CurrentWeek === "B")): ?>
+                <button type="submit" name="action" value="next">➡️ Next: <?= htmlspecialchars($nextDay) ?></button>
+            <?php else: ?>
+                <p>🎉 All days completed!</p>
+            <?php endif; ?>
+
+            <!-- Back Button -->
+            <?php if (!($day == "Monday" && $CurrentWeek === "A")): ?>
+                <button type="submit" name="action" value="back">⬅️ Back: <?= htmlspecialchars($previousday) ?></button>
+            <?php elseif ($day == "Monday" && $CurrentWeek === "A"):?>
+                <button type="submit" formaction="create_timetable.php">⬅️ Back: <?= htmlspecialchars("Class creator") ?></button>
+            <?php endif; ?>
+
+        </div>
+    </form>
+</div>
+       
+    
 
    
 
-    <!-- Next Button -->
-    <?php if (!($day == "Friday" && $CurrentWeek === "B")): ?>
-        <a href="?day=<?= urlencode($nextDay) ?>&week=<?= urlencode($nextWeek) ?>">
-            <button type="button">➡️ Next: <?= htmlspecialchars($nextDay) ?></button>
-        </a>
-    <?php else: ?>
-        <p>🎉 All days completed!</p>
-    <?php endif; ?>
-
-     <!-- Back Button -->
-    <?php if (!($day == "Monday" && $CurrentWeek === "A")): ?>
-        <a href="?day=<?= urlencode($previousday) ?>&week=<?= urlencode($previousweek) ?>">
-            <button type="button">⬅️ Back: <?= htmlspecialchars($previousday) ?></button>
-        </a>
-    <?php elseif ($day == "Monday" && $CurrentWeek === "A"): ?>
-        <form action="create_timetable.php" method="POST">
-             <button type="submit">⬅️ Back: <?= htmlspecialchars("Class creator") ?></button>
-        </form>
-    <?php endif; ?>
+    
 
 </body>
 </html>
