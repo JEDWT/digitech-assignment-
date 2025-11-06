@@ -244,7 +244,7 @@ $periods = [
             <?php if (!($day == "Friday" && $CurrentWeek === "B")): ?>
                 <button type="submit" name="action" value="next">➡️ Next: <?= htmlspecialchars($nextDay) ?></button>
             <?php else: ?>
-                <p>🎉 All days completed!</p>
+               <button type="submit" formaction="timetable.php">Finish TimeTable!</button>
             <?php endif; ?>
 
             <!-- Back Button -->
