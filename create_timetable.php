@@ -202,7 +202,7 @@ if (isset($_GET['updated'])) $message = "Class updated successfully!";
     <h2>Timetable Builder (Next Step)</h2>
     <p>Once you’ve added all your subjects, you can begin assigning them to days and periods.</p>
 
-    <form action="build_timetable.php" method="GET">
+    <form action="index.php" method="GET">
         <input type="hidden" name="day" value="Monday">
         <button type="submit" style="
             background: #0078ff;

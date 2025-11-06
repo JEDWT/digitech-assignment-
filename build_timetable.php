@@ -185,12 +185,7 @@ $periods = [
 
     <br>
 
-    <!-- Back Button -->
-    <?php if (!($day == "Monday" && $CurrentWeek === "A")): ?>
-        <a href="?day=<?= urlencode($previousday) ?>&week=<?= urlencode($previousweek) ?>">
-            <button type="button">⬅️ Back: <?= htmlspecialchars($previousday) ?></button>
-        </a>
-    <?php endif; ?>
+   
 
     <!-- Next Button -->
     <?php if (!($day == "Friday" && $CurrentWeek === "B")): ?>
@@ -199,6 +194,17 @@ $periods = [
         </a>
     <?php else: ?>
         <p>🎉 All days completed!</p>
+    <?php endif; ?>
+
+     <!-- Back Button -->
+    <?php if (!($day == "Monday" && $CurrentWeek === "A")): ?>
+        <a href="?day=<?= urlencode($previousday) ?>&week=<?= urlencode($previousweek) ?>">
+            <button type="button">⬅️ Back: <?= htmlspecialchars($previousday) ?></button>
+        </a>
+    <?php elseif ($day == "Monday" && $CurrentWeek === "A"): ?>
+        <form action="create_timetable.php" method="POST">
+             <button type="submit">⬅️ Back: <?= htmlspecialchars("Class creator") ?></button>
+        </form>
     <?php endif; ?>
 
 </body>
