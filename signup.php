@@ -1,6 +1,7 @@
 <?php
 session_start();
-include 'php/db_connect.php'; // includes the data base connection script
+require_once 'php/db_connect.php'; // includes the data base connection script
+
 // keep in mind that this is my first php script so i do have some comments to help me remeber
 if ($_SERVER["REQUEST_METHOD"] === "POST") { // recieving the post from the html
     $email = $_POST['email']; // takes the email from the post
