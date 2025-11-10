@@ -3,15 +3,13 @@ session_start();
 require_once 'php/db_connect.php';
 require_once 'php/auth_check.php';
 
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit;
+}
+
 $userid = $_SESSION['user_id'];
 $timetable_created = 1;
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $confirm = $conn->prepare("UPDATE users SET timetable_created = ? WHERE id = ?");
-    $confirm->bind_param("ii",$timetable_created,$userid);
-    $confirm->execute();
-    $confirm->close();
-};
 
 $subjects = $conn->prepare("SELECT id,Subject_name,teacher_name FROM classes WHERE user_id = ?");
 $subjects->bind_param("i",$userid);
@@ -34,7 +32,7 @@ $weeks = 2;
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-    <title>Timetable - <?= htmlspecialchars($day) ?></title>
+    <title>Timetable - </title>
 </head>
 <body>
     <table border="1">

@@ -5,7 +5,18 @@ require_once 'php/auth_check.php';
 
 // If logged in, redirect to timetable
 if (isset($_SESSION['user_id'])) {
-    header("Location: create_timetable.php");
+
+    $created = $conn->prepare("SELECT timetable_created FROM users WHERE id = ?");
+    $created->bind_param("i",$_SESSION['user_id']);
+    $created->execute();
+    $result = $created->get_result();
+    $TimeTable_Created = $result->fetch_assoc();
+    
+    if ($TimeTable_Created['timetable_created'] == 1) {
+        header("Location: Homepage.php");
+    } else {
+        header("Location: create_timetable.php");
+    }
     exit;
 }
 

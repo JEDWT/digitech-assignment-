@@ -3,6 +3,11 @@ session_start();
 require_once 'php/db_connect.php';
 require_once 'php/auth_check.php';
 
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit;
+}
+
 $user_id = $_SESSION['user_id'];
 $message = "";
 
@@ -223,7 +228,7 @@ $periods = [
             <?php if (!($day == "Friday" && $CurrentWeek === "B")): ?>
                 <button type="submit" name="action" value="next">➡️ Next: <?= htmlspecialchars($nextDay) ?></button>
             <?php else: ?>
-               <button type="submit" formaction="timetable.php">Finish TimeTable!</button>
+               <button type="submit" formaction="Homepage.php">Finish TimeTable!</button>
             <?php endif; ?>
 
             <!-- Back Button -->
