@@ -8,13 +8,21 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    echo $_SESSION['username'];
-    $userid = $_SESSION['user_id'];
-    $timetable_created = 1;
-    $confirm = $conn->prepare("UPDATE users SET timetable_created = ? WHERE id = ?");
-    $confirm->bind_param("ii",$timetable_created,$userid);
-    $confirm->execute();
-    $confirm->close();
+
+    $created = $conn->prepare("SELECT timetable_created FROM users WHERE id = ?");
+    $created->bind_param("i",$_SESSION['user_id']);
+    $created->execute();
+    $result = $created->get_result();
+    $TimeTable_Created = $result->fetch_assoc();
+
+    if ($TimeTable_Created['timetable_created'] == 0) {
+        $userid = $_SESSION['user_id'];
+        $timetable_created = 1;
+        $confirm = $conn->prepare("UPDATE users SET timetable_created = ? WHERE id = ?");
+        $confirm->bind_param("ii",$timetable_created,$userid);
+        $confirm->execute();
+        $confirm->close();
+    }   
 };
 
 

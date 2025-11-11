@@ -11,39 +11,58 @@ if (!isset($_SESSION['user_id'])) {
 $userid = $_SESSION['user_id'];
 $timetable_created = 1;
 
-$subjects = $conn->prepare("SELECT id,Subject_name,teacher_name FROM classes WHERE user_id = ?");
+$subjects = $conn->prepare("SELECT id,Subject_name,teacher_name,location FROM classes WHERE user_id = ?");
 $subjects->bind_param("i",$userid);
 $subjects->execute();
 $subect_Results = $subjects->get_result();
 $subjectsTable = [];
 $teacherNames = [];
+$roomlocations = [];
 while ($data = $subect_Results->fetch_assoc()) {
     $Subject_ID = $data['id'];
     $Subject_Name = $data['Subject_name'];
     $teacherName = $data['teacher_name'];
+    $location = $data['location'];
     $subjectsTable[$Subject_ID] = $Subject_Name;
     $teacherNames[$Subject_ID] = $teacherName;
+    $roomlocations[$Subject_ID] = $location;
 }
+
+$periodsTimes = [
+    0 => "8:30 - 8:40", // fratelli
+    1 => "8:40 - 9:40",
+    2 => "9:40 - 10:40",
+    3 => "11:00 - 12:00",
+    4 => "12:00 - 1:00",
+    5 => "1:40 - 2:40"
+];
 
 $day_Names = ["Monday","Tuesday","Wednesday","Thursday","Friday"];
 $Week_Types = ["A","B"];
 $periods = 5;
 $days = 5;
 $weeks = 2;
+
+// im to lazy to do css
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-    <title>Timetable - </title>
+    <title>Timetable - </title> 
 </head>
 <body>
+    <form method="POST">
+        <div>
+            <button type="submit" formaction="Homepage.php"> Homepage</button>
+        </div>
+    </form>
     <table border="1">
     <tr>
         <th>Week</th>
         <th>Day</th>
         <?php for ($p = 1; $p <= $periods; $p++): ?>
-            <th>Period <?= $p ?></th>
+            <th>Period <?= $p ?> <br> <?= $periodsTimes[$p] ?></th>
         <?php endfor; ?>
     </tr>
 
@@ -70,7 +89,8 @@ $weeks = 2;
             <td><?= $day_name ?></td>
             <?php for ($p = 1; $p <= $periods; $p++): ?>
                 <td><?= isset($timetable[$p]) ? htmlspecialchars($subjectsTable[$timetable[$p]]) : "-" ?>
-            <br>   <?= isset($timetable[$p]) ? htmlspecialchars($teacherNames[$timetable[$p]]) : "-" ?></td>
+            <br>   <?= isset($timetable[$p]) ? htmlspecialchars($teacherNames[$timetable[$p]]) : "-" ?>
+            <br>   <?= isset($timetable[$p]) ? htmlspecialchars($roomlocations[$timetable[$p]]) : "-" ?></td>
             <?php endfor; ?>
         </tr>
     <?php endfor; 
