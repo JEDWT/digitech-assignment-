@@ -16,10 +16,13 @@ $subjects->bind_param("i",$userid);
 $subjects->execute();
 $subect_Results = $subjects->get_result();
 $subjectsTable = [];
+$teacherNames = [];
 while ($data = $subect_Results->fetch_assoc()) {
     $Subject_ID = $data['id'];
     $Subject_Name = $data['Subject_name'];
+    $teacherName = $data['teacher_name'];
     $subjectsTable[$Subject_ID] = $Subject_Name;
+    $teacherNames[$Subject_ID] = $teacherName;
 }
 
 $day_Names = ["Monday","Tuesday","Wednesday","Thursday","Friday"];
@@ -66,7 +69,8 @@ $weeks = 2;
             <td><?= $week_type ?></td>
             <td><?= $day_name ?></td>
             <?php for ($p = 1; $p <= $periods; $p++): ?>
-                <td><?= isset($timetable[$p]) ? htmlspecialchars($subjectsTable[$timetable[$p]]) : "-" ?></td>
+                <td><?= isset($timetable[$p]) ? htmlspecialchars($subjectsTable[$timetable[$p]]) : "-" ?>
+            <br>   <?= isset($timetable[$p]) ? htmlspecialchars($teacherNames[$timetable[$p]]) : "-" ?></td>
             <?php endfor; ?>
         </tr>
     <?php endfor; 

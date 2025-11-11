@@ -8,6 +8,9 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    echo $_SESSION['username'];
+    $userid = $_SESSION['user_id'];
+    $timetable_created = 1;
     $confirm = $conn->prepare("UPDATE users SET timetable_created = ? WHERE id = ?");
     $confirm->bind_param("ii",$timetable_created,$userid);
     $confirm->execute();

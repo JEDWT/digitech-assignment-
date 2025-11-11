@@ -9,6 +9,22 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+// If logged in, redirect to timetable
+if (isset($_SESSION['user_id'])) {
+
+    $created = $conn->prepare("SELECT timetable_created FROM users WHERE id = ?");
+    $created->bind_param("i",$_SESSION['user_id']);
+    $created->execute();
+    $result = $created->get_result();
+    $TimeTable_Created = $result->fetch_assoc();
+    
+    if ($TimeTable_Created['timetable_created'] == 1) {
+        header("Location: Homepage.php");
+        exit;
+    }
+
+}
+
 $user_id = $_SESSION['user_id'];
 $message = "";
 
@@ -19,10 +35,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $subject_name = trim($_POST['subject_name']);
     $teacher_name = trim($_POST['teacher_name'] ?? '');
     $color = trim($_POST['color'] ?? '');
+    $location = $_POST['location'] ?? '';
 
     if (!empty($subject_name)) {
-        $stmt = $conn->prepare("INSERT INTO classes (user_id, subject_name, teacher_name, color) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("isss", $user_id, $subject_name, $teacher_name, $color);
+        $stmt = $conn->prepare("INSERT INTO classes (user_id, subject_name, teacher_name, color,location) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("issss", $user_id, $subject_name, $teacher_name, $color,$location);
         $stmt->execute();
         $stmt->close();
 
@@ -63,10 +80,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $subject_name = trim($_POST['subject_name']);
     $teacher_name = trim($_POST['teacher_name'] ?? '');
     $color = trim($_POST['color'] ?? '');
+    $location = $_POST['location'] ?? '';
 
     if (!empty($subject_name)) {
-        $stmt = $conn->prepare("UPDATE classes SET subject_name = ?, teacher_name = ?, color = ? WHERE id = ? AND user_id = ?");
-        $stmt->bind_param("sssii", $subject_name, $teacher_name, $color, $edit_id, $user_id);
+        $stmt = $conn->prepare("UPDATE classes SET subject_name = ?, teacher_name = ?, color = ?, location = ? WHERE id = ? AND user_id = ?");
+        $stmt->bind_param("ssssii", $subject_name, $teacher_name, $color,$location, $edit_id, $user_id);
         $stmt->execute();
         $stmt->close();
 
@@ -165,10 +183,13 @@ if (isset($_GET['updated'])) $message = "Class updated successfully!";
             <label>Subject Name:</label>
             <input type="text" name="subject_name" required>
 
-            <label>Teacher Name (optional):</label>
-            <input type="text" name="teacher_name">
+            <label>Teacher Name:</label>
+            <input type="text" name="teacher_name" required>
 
-            <label>Color (optional):</label>
+            <label>Room:</label>
+            <input type="text" name="location" required>
+
+            <label>Colour (optional):</label>
             <input type="color" name="color">
 
             <button type="submit">Add Subject</button>
@@ -188,7 +209,8 @@ if (isset($_GET['updated'])) $message = "Class updated successfully!";
                             <input type="hidden" name="action" value="edit">
                             <input type="hidden" name="class_id" value="<?= $class['id'] ?>">
                             <input type="text" name="subject_name" value="<?= htmlspecialchars($class['subject_name']) ?>" required>
-                            <input type="text" name="teacher_name" value="<?= htmlspecialchars($class['teacher_name']) ?>">
+                            <input type="text" name="teacher_name" value="<?= htmlspecialchars($class['teacher_name']) ?>" required>
+                            <input type="text" name="location" value="<?= htmlspecialchars($class['location']) ?>" required>
                             <input type="color" name="color" value="<?= htmlspecialchars($class['color'] ?: '#e9f2ff') ?>">
                             <button class="edit-btn" type="submit">Save</button>
                         </form>
