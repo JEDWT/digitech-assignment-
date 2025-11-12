@@ -12,7 +12,7 @@ if (!isset($_SESSION['user_id'])) {
 if (isset($_GET['q'])) {
     $search = $_GET['q'];
 
-    $stmt = $conn->prepare("SELECT First_Name FROM users WHERE First_Name LIKE ? LIMIT 5");
+    $stmt = $conn->prepare("SELECT id,First_Name FROM users WHERE First_Name LIKE ? LIMIT 5");
     $term = "%" . $search . "%";
     $stmt->bind_param("s", $term);
     $stmt->execute();
@@ -67,8 +67,24 @@ if (isset($_GET['q'])) {
     const search = document.getElementById("search");
     const results = document.getElementById("results");
 
-    search.addEventListener("keyup", () => {
+    // When user types
+    search.addEventListener("keyup", (e) => {
       const query = search.value.trim();
+
+      // If Enter key pressed and input not empty
+      if (e.key === "Enter" && query.length > 0) {
+        // Get first match if available
+        const firstResult = results.querySelector("p");
+        if (firstResult) {
+          const id = firstResult.dataset.id;
+          const name = firstResult.textContent;
+          window.location.href = `viewer.php?id=${encodeURIComponent(id)}&name=${encodeURIComponent(name)}`;
+        } else {
+          // Just redirect using the typed name if no match yet
+          window.location.href = `viewer.php?name=${encodeURIComponent(query)}`;
+        }
+        return;
+      }
 
       if (query.length === 0) {
         results.innerHTML = "";
@@ -86,13 +102,15 @@ if (isset($_GET['q'])) {
       xhr.send();
     });
 
-    // Optional: fill search box when a result is clicked
-    results.addEventListener("click", e => {
+    // When a search result is clicked
+    results.addEventListener("click", (e) => {
       if (e.target.tagName === "P") {
-        search.value = e.target.textContent;
-        results.innerHTML = "";
+        const id = e.target.dataset.id;
+        const name = e.target.textContent;
+        window.location.href = `viewer.php?id=${encodeURIComponent(id)}&name=${encodeURIComponent(name)}`;
       }
     });
   </script>
+
 </body>
 </html>

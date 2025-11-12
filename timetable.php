@@ -32,8 +32,8 @@ $periodsTimes = [
     0 => "8:30 - 8:40", // fratelli
     1 => "8:40 - 9:40",
     2 => "9:40 - 10:40",
-    3 => "11:00 - 12:00",
-    4 => "12:00 - 1:00",
+    3 => "11:10 - 12:08",
+    4 => "12:12 - 1:10",
     5 => "1:40 - 2:40"
 ];
 
@@ -59,10 +59,14 @@ $weeks = 2;
     </form>
     <table border="1">
     <tr>
-        <th>Week</th>
-        <th>Day</th>
-        <?php for ($p = 1; $p <= $periods; $p++): ?>
-            <th>Period <?= $p ?> <br> <?= $periodsTimes[$p] ?></th>
+       
+        <th></th>
+        <?php for ($p = 0; $p <= $periods; $p++): ?>
+            <?php if ($p == 0):?>
+                <th>Fratelli <br> <?= $periodsTimes[$p] ?></th>
+            <?php else: ?>
+                <th>Period <?= $p ?> <br> <?= $periodsTimes[$p] ?></th>
+            <?php endif; ?>
         <?php endfor; ?>
     </tr>
 
@@ -85,9 +89,8 @@ $weeks = 2;
             $classes->close();
     ?>
         <tr>
-            <td><?= $week_type ?></td>
-            <td><?= $day_name ?></td>
-            <?php for ($p = 1; $p <= $periods; $p++): ?>
+            <td><?= $day_name ?> <?= $week_type ?></td>
+            <?php for ($p = 0; $p <= $periods; $p++): ?>
                 <td><?= isset($timetable[$p]) ? htmlspecialchars($subjectsTable[$timetable[$p]]) : "-" ?>
             <br>   <?= isset($timetable[$p]) ? htmlspecialchars($teacherNames[$timetable[$p]]) : "-" ?>
             <br>   <?= isset($timetable[$p]) ? htmlspecialchars($roomlocations[$timetable[$p]]) : "-" ?></td>
